@@ -1,16 +1,12 @@
-import { createStore, applyMiddleware } from 'redux';
-import modules from './modules';
-
-import { createLogger } from 'redux-logger';
-import ReduxThunk from 'redux-thunk';
+import { createStore, applyMiddleware, compose } from 'redux';
 import penderMiddleware from 'redux-pender';
 
+import reducers from 'modules';
 
-/* 로그 미들웨어를 생성 할 때 설정을 커스터마이징 할 수 있습니다.
-   https://github.com/evgenyrodionov/redux-logger#options
-*/
-const logger = createLogger(); 
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-const store = createStore(modules, applyMiddleware(logger, ReduxThunk, penderMiddleware()));
+const store = createStore(reducers, composeEnhancers(
+   applyMiddleware(penderMiddleware())
+));
 
 export default store;

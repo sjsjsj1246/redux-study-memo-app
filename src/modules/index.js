@@ -1,10 +1,10 @@
 import { combineReducers } from 'redux';
-import counter from './counter';
-import post from './post';
 import { penderReducer } from 'redux-pender';
+import memo from './memo';
+import ui from './ui';
 
 export default combineReducers({
-    counter,
-    post,
+    memo,
+    ui,
     pender: penderReducer
 });
