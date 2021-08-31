@@ -1,39 +1,50 @@
 import { createAction, handleActions } from 'redux-actions';
-import { applyPenders } from 'redux-pender';
 import axios from 'axios';
+import { call, put, takeEvery } from 'redux-saga/effects';
 
 function getPostAPI(postId) {
-    return axios.get(`https://jsonplaceholder.typicode.com/posts/${postId}`)
+    return axios.get(`https://jsonplaceholder.typicode.com/posts/${postId}`);
 }
 
 const GET_POST = 'GET_POST';
+const GET_POST_SUCCESS = 'GET_POST_SUCCESS';
+const GET_POST_FAILURE = 'GET_POST_FAILURE';
 
-export const getPost = createAction(GET_POST, getPostAPI);
+export const getPost = createAction(GET_POST, postId => postId);
 
-const initialState = { 
-    post: {
-        title: "",
-        body: ""
+const something = () => ({
+    data: { title: 'hello', body: 'world' }
+});
+
+function* getPostSaga(action) {
+    console.log(call(something, ''));
+    try {
+        const response = yield call(getPostAPI, action.payload);
+        yield put({ type: GET_POST_SUCCESS, payload: response });
+    } catch (e) {
+        yield put({ type: GET_POST_FAILURE, payload: e });
     }
 }
 
-const reducer = handleActions({
-    // ... some other action handlers...
-}, initialState);
-
-export default applyPenders(reducer, [
-    {
-        type: GET_POST,
-        onPending: (state, action) => {
-            return state; // do something
-        },
-        onSuccess: (state, action) => {
-            return {
-                post: action.payload.data
-            }
-        },
-        onFailure: (state, action) => {
-            return state; // do something
-        }
+const initialState = {
+    data: {
+        title: '',
+        body: ''
     }
-])
+};
+
+export function* postSaga() {
+    yield takeEvery('GET_POST', getPostSaga);
+}
+
+export default handleActions(
+    {
+        [GET_POST_SUCCESS]: (state, action) => {
+            const { title, body } = action.payload.data;
+            return {
+                data: { title, body }
+            };
+        }
+    },
+    initialState
+);
